@@ -9,7 +9,7 @@ class EpsilonGreedy(Greedy):
         super().__init__(n_arms, distribution, dist_name)
         self.epsilon = eps
     
-    def act(self): # return index of chosen bandit
+    def choose_arm(self): # return index of chosen bandit
         if self.iteration == 0:
             return randrange(self.n_arms) # pick random at first    
         
