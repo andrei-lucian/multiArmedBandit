@@ -17,7 +17,8 @@ def run_experiment(agent, time_steps, repetitions):
 
   all_rewards = np.zeros((repetitions, time_steps)) # 2d array to keep track of cumulative reward
   best_bandit = find_best_bandit(agent) # find the index of the best bandit
-  best_action_counter = np.zeros(repetitions) # keep track of the number of times the best bandit is selected
+  best_action_counter = 0 # keep track of the number of times the best bandit is selected
+  best_action_percentage = np.zeros((repetitions, time_steps))
 
   for rep in range(repetitions): # repetitions
     
@@ -25,24 +26,38 @@ def run_experiment(agent, time_steps, repetitions):
       current_total_reward, chosen_index = agent.update() # get current reward and chosen index of agent 
       all_rewards[rep][step] = current_total_reward
       if chosen_index == best_bandit: # increment counter if best action is chosen 
-        best_action_counter[rep] += 1 
+        best_action_counter += 1 
+      best_action_percentage[rep][step] = best_action_counter*100/step
+      
+    best_action_counter = 0
     agent.reset()
 
-  best_action_freq = best_action_counter*100/time_steps # percentage of time steps the best action was chosen
-  mean_best_action_freq = best_action_freq.mean()
   mean_reward = all_rewards.mean(axis=0) # mean reward over all repetitions
-  print("Mean percentage of times that the best action is taken:", mean_best_action_freq)
-  return best_action_freq, mean_reward
+  mean_percentage = best_action_percentage.mean(axis=0)
+  return mean_reward, mean_percentage
 
-def plot_learning(agents, labels, time_steps, repetitions):
+def concatenate_experiments(agents, labels, time_steps, repetitions):
   agents_rewards = []
-  for i, agent in enumerate(agents):
-    best_action_freq, mean_reward = run_experiment(agent, time_steps, repetitions)
+  agents_percentages = []
+
+  for agent in enumerate(agents):
+    mean_reward, mean_percentage = run_experiment(agent, time_steps, repetitions)
     agents_rewards.append(mean_reward)
-  x = np.linspace(0, time_steps, time_steps, dtype=int)
+    agents_percentages.append(mean_percentage)
+
   agents_rewards = np.array(agents_rewards)
   agents_rewards = agents_rewards.swapaxes(0,1)
-  df = pd.DataFrame(data = agents_rewards, columns=labels)
+  agents_rewards = pd.DataFrame(data = agents_rewards, columns=labels)
+
+  agents_percentages = np.array(agents_percentages)
+  agents_percentages = agents_percentages.swapaxes(0,1)
+  agents_percentages = pd.DataFrame(data = agents_percentages, columns=labels)
+
+  return agents_rewards, agents_percentages
+
+def plot_learning(rewards, percentages):
   sns.set(rc={'figure.figsize':(10,7)})
-  fig = sns.lineplot(data=df)
-  fig.set(xlabel='Episode', ylabel='Total reward')
+  reward_plot = sns.lineplot(data=rewards)
+  reward_plot.set(xlabel='Episode', ylabel='Total reward')
+  percentage_plot = sns.lineplot(data=percentages)
+  percentage_plot.set(xlabel='Episode', ylabel='Percentage of times the best action is chosen')
