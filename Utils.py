@@ -2,6 +2,7 @@ import random
 import numpy as np
 import pandas as pd 
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 def find_best_bandit(agent):
     d = np.asarray(agent.distribution)
@@ -19,6 +20,7 @@ def run_experiment(agent, time_steps, repetitions):
   best_bandit = find_best_bandit(agent) # find the index of the best bandit
   best_action_counter = 0 # keep track of the number of times the best bandit is selected
   best_action_percentage = np.zeros((repetitions, time_steps))
+  print("best bandit = ", best_bandit)
 
   for rep in range(repetitions): # repetitions
     
@@ -27,7 +29,9 @@ def run_experiment(agent, time_steps, repetitions):
       all_rewards[rep][step] = current_total_reward
       if chosen_index == best_bandit: # increment counter if best action is chosen 
         best_action_counter += 1 
-      best_action_percentage[rep][step] = best_action_counter*100/step
+      best_action_percentage[rep][step] = (best_action_counter*100)/(step+1)
+      print("ba counter = ", best_action_counter)
+      print("ba percentage this step = ", best_action_percentage[rep][step])
       
     best_action_counter = 0
     agent.reset()
@@ -36,11 +40,13 @@ def run_experiment(agent, time_steps, repetitions):
   mean_percentage = best_action_percentage.mean(axis=0)
   return mean_reward, mean_percentage
 
-def concatenate_experiments(agents, labels, time_steps, repetitions):
+def concatenate_experiments(agents, time_steps, repetitions):
+  labels = []
   agents_rewards = []
   agents_percentages = []
 
-  for agent in enumerate(agents):
+  for agent in agents:
+    labels.append(agent.get_label())
     mean_reward, mean_percentage = run_experiment(agent, time_steps, repetitions)
     agents_rewards.append(mean_reward)
     agents_percentages.append(mean_percentage)
@@ -59,5 +65,7 @@ def plot_learning(rewards, percentages):
   sns.set(rc={'figure.figsize':(10,7)})
   reward_plot = sns.lineplot(data=rewards)
   reward_plot.set(xlabel='Episode', ylabel='Total reward')
+  plt.show()
   percentage_plot = sns.lineplot(data=percentages)
   percentage_plot.set(xlabel='Episode', ylabel='Percentage of times the best action is chosen')
+  plt.show()

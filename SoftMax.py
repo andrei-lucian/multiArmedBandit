@@ -8,10 +8,10 @@ class SoftMax(Agent):
   def __init__(self, n_arms, distribution, dist_name, tau):
     super().__init__(n_arms, distribution, dist_name)
     self.tau = tau
+    self.label = "softmax, tau = " + str(tau)
 
   def reset(self): # reset function
     super().reset()
-    print("reset from SoftMax class called")
     self.probabilities = np.zeros(self.n_arms)
     #print("estimated values at start: ", self.estimated_values)
 

@@ -8,6 +8,7 @@ class EpsilonGreedy(Greedy):
     def __init__(self, n_arms, distribution, dist_name, eps):
         super().__init__(n_arms, distribution, dist_name)
         self.epsilon = eps
+        self.label = "epsilon greedy, eps = " + str(eps)
     
     def choose_arm(self): # return index of chosen bandit
         if self.iteration == 0:

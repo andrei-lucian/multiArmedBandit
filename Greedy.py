@@ -6,7 +6,7 @@ class Greedy(Agent):
 
   def __init__(self, n_arms, distribution, dist_name):
     super().__init__(n_arms, distribution, dist_name)
-    print(n_arms, dist_name)
+    self.label = "greedy"
 
   def choose_arm(self): # return index of chosen bandit
     if self.iteration == 0:

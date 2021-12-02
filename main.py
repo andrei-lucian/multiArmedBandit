@@ -8,13 +8,15 @@ import Utils
 
 b = Utils.bernoulliDis(5)
 print(b)
-params = 5, b, "bernoulli"
-# a = Agent(5, b, "bernoulli")
-# g = Greedy(5, b, "bernoulli")
+g = Utils.gaussianDis(5)
+print(g)
+params = 5, g, "gaussian"
 
-# for _ in range(5):  
-#     g.update()
-
-# e = EpsilonGreedy(5, b, "bernoulli", 0.9)
 o = Optimistic(*params)
+print("\n")
+
 s = SoftMax(*params, 3)
+
+agents = [o]
+r, p = Utils.concatenate_experiments(agents, 20, 1)
+Utils.plot_learning(r,p)

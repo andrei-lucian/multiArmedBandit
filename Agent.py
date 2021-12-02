@@ -10,8 +10,10 @@ class Agent:
         self.distribution = distribution
         self.reset()
 
+    def get_label(self):
+        return self.label
+    
     def reset(self):
-        print("reset from Agent class called")
         self.iteration = 0
         self.estimated_values = np.zeros(self.n_arms)
         self.rewards = np.zeros(self.n_arms) # fill with 0 

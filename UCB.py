@@ -6,11 +6,11 @@ class UCB(Agent):
 
   def __init__(self, n_arms, distribution, dist_name, c):
     super().__init__(n_arms, distribution, dist_name)
+    self.label = "UCB, c = " + str(c)
     self.c = c
 
   def reset(self): # reset function
     super().reset()
-    print("reset from UCB class called")
     self.ucb_values = np.zeros(self.n_arms)
 
   def choose_arm(self): # return index of chosen bandit
