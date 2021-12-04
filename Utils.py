@@ -22,6 +22,7 @@ def run_experiment(agent, time_steps, repetitions):
   best_action_percentage = np.zeros((repetitions, time_steps))
 
   for rep in range(repetitions): # repetitions
+    print(rep)
     best_bandit = find_best_bandit(agent) # find the index of the best bandit
 
     for step in range(time_steps): # time steps 
@@ -36,8 +37,6 @@ def run_experiment(agent, time_steps, repetitions):
 
   mean_reward = all_rewards.mean(axis=0) # mean reward over all repetitions
   mean_percentage = best_action_percentage.mean(axis=0)
-  print(best_action_percentage)
-  print(mean_percentage)
   return mean_reward, mean_percentage
 
 def concatenate_experiments(agents, time_steps, repetitions):
