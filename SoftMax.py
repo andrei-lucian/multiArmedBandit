@@ -5,8 +5,8 @@ import random
 
 class SoftMax(Agent):
 
-  def __init__(self, n_arms, distribution, dist_name, tau):
-    super().__init__(n_arms, distribution, dist_name)
+  def __init__(self, n_arms, dist_name, tau):
+    super().__init__(n_arms, dist_name)
     self.tau = tau
     self.label = "softmax, tau = " + str(tau)
 
@@ -20,10 +20,8 @@ class SoftMax(Agent):
       return self.iteration
       
     else:
-        if self.dist_name == "bernoulli": # bernoulli
-            self.estimated_values = np.divide(self.rewards, self.arm_pulls, out=np.zeros_like(self.rewards), where=self.arm_pulls!=0) # ratio of value 
-        probs = self.calculate_probs()
-        return self.arm_selection(probs) # max val
+      probs = self.calculate_probs()
+      return self.arm_selection(probs) # max val
     
   # Arm selection based on Softmax probability
   def arm_selection(self, probs):
