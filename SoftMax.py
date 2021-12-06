@@ -1,7 +1,6 @@
 from Agent import Agent
 import numpy as np
 import math
-import random
 
 class SoftMax(Agent):
 
@@ -20,25 +19,10 @@ class SoftMax(Agent):
       return self.iteration
       
     else:
-      probs = self.calculate_probs()
-      return self.arm_selection(probs) # max val
-    
-  # Arm selection based on Softmax probability
-  def arm_selection(self, probs):
-    z = random.random()
-    cum_prob = 0.0
-    
-    for i in range(len(probs)):
-        prob = probs[i]
-        cum_prob += prob
-        
-        if cum_prob > z:
-            return i
-    return len(probs) - 1
+      self.calculate_probs()
+      return np.random.choice(self.n_arms, p=self.probabilities) # max val
       
   def calculate_probs(self):
    # Calculate Softmax probabilities based on each round
     z = sum([math.exp(v / self.tau) for v in self.estimated_values])
-    probs = [math.exp(v / self.tau) / z for v in self.estimated_values]
-    # Use categorical_draw to pick arm
-    return probs
+    self.probabilities = [math.exp(v / self.tau) / z for v in self.estimated_values]

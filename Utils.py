@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd 
 import seaborn as sns
 import matplotlib.pyplot as plt
-import os
+from pathlib import Path
+from progressbar import ProgressBar
 
 def find_best_bandit(agent):
     d = np.asarray(agent.distribution)
@@ -16,13 +17,12 @@ def gaussianDis(n_bandits):
     return [float(np.random.normal(5, 1.5, 1)) for _ in range(n_bandits)]
 
 def run_experiment(agent, time_steps, repetitions):
-
   all_rewards = np.zeros((repetitions, time_steps)) # 2d array to keep track of cumulative reward
   best_action_counter = 0 # keep track of the number of times the best bandit is selected
   best_action_percentage = np.zeros((repetitions, time_steps))
 
   for rep in range(repetitions): # repetitions
-    print(rep)
+    
     best_bandit = find_best_bandit(agent) # find the index of the best bandit
 
     for step in range(time_steps): # time steps 
@@ -40,11 +40,12 @@ def run_experiment(agent, time_steps, repetitions):
   return mean_reward, mean_percentage
 
 def concatenate_experiments(agents, time_steps, repetitions):
+  pbar = ProgressBar()
   labels = []
   agents_rewards = []
   agents_percentages = []
 
-  for agent in agents:
+  for agent in pbar(agents):
     labels.append(agent.get_label())
     mean_reward, mean_percentage = run_experiment(agent, time_steps, repetitions)
     agents_rewards.append(mean_reward)
@@ -61,17 +62,10 @@ def concatenate_experiments(agents, time_steps, repetitions):
   return agents_rewards, agents_percentages
 
 def plot_learning(rewards, percentages, fig_name):
-  path = os.path.abspath(os.getcwd())
-  path = os.path.join(path, 'plots\\')   
-  if not os.path.isdir(path):
-    os.makedirs(path)
-  
-  r_path = os.path.join(path, fig_name + "_r")
-  p_path = os.path.join(path, fig_name + "_p")
-
+  r_path, p_path = make_paths(fig_name)
   sns.set(rc={'figure.figsize':(10,7)})
   reward_plot = sns.lineplot(data=rewards)
-  reward_plot.set(xlabel='Episode', ylabel='Total reward')
+  reward_plot.set(xlabel='Episode', ylabel='Average reward')
   reward_plot.get_figure().savefig(r_path)
   reward_plot.get_figure().clf()
 
@@ -79,3 +73,13 @@ def plot_learning(rewards, percentages, fig_name):
   percentage_plot.set(xlabel='Episode', ylabel='Percentage of times the best action is chosen')
   percentage_plot.get_figure().savefig(p_path)
   percentage_plot.get_figure().clf()
+
+def make_paths(fig_name):
+  path = Path(__file__).resolve().parent / "plots"
+  Path(path).mkdir(parents=True, exist_ok=True)
+
+  path = path / fig_name
+
+  r_path = Path(str(path) + "_r")
+  p_path = Path(str(path) + "_p")
+  return r_path, p_path

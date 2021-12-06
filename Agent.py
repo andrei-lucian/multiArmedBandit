@@ -17,7 +17,7 @@ class Agent:
     
     def reset(self):
         self.iteration = 0
-        self.estimated_values = np.zeros(self.n_arms)
+        self.estimated_values = np.zeros(self.n_arms, dtype=float)
         self.rewards = np.zeros(self.n_arms)
         self.arm_pulls = np.zeros(self.n_arms) 
         self.total = 0
@@ -32,23 +32,28 @@ class Agent:
         return
 
     def update(self):
-        self.estimated_values = np.divide(self.rewards, self.arm_pulls, out=np.zeros_like(self.rewards), where=self.arm_pulls!=0) # ratio of value 
+        for n in range(self.n_arms):
+            if self.arm_pulls[n] != 0:
+                val = float(self.rewards[n] / self.arm_pulls[n])
+                self.estimated_values[n] = float(val)
+
+        #self.estimated_values = np.divide(self.rewards, self.arm_pulls, out=np.zeros_like(self.rewards), where=self.arm_pulls!=0) # ratio of value 
         self.chosen_arm = self.choose_arm()
-        #print("chosen arm: ", chosen_arm)
+        #print("chosen arm: ", self.chosen_arm)
         val = self.distribution[self.chosen_arm]
         self.arm_pulls[self.chosen_arm] += 1
 
         if self.dist_name == "bernoulli": # bernoulli
             rand = random.random() # random val for bernoulli chance
             self.generated_reward = 1 if rand < val else 0 
-            #print("reward gained: ", reward)
+            #print("reward gained: ", self.generated_reward)
             if self.generated_reward:
                 self.rewards[self.chosen_arm] += 1 # increment successes 
                 self.total = self.rewards.sum()
         else:
             self.generated_reward = float(np.random.normal(val, 1.5, 1))
             self.rewards[self.chosen_arm] += self.generated_reward
-            #print("reward gained: ", generated_reward)
+            #print("reward gained: ", self.generated_reward)
             self.total += self.generated_reward
         #self.debug_prints()
         self.iteration += 1

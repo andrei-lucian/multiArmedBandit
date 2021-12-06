@@ -18,13 +18,10 @@ class ActionPreferences(Agent):
         
         else:
             self.update_H(self.chosen_arm)
-            return self.highest_preference() # max val
-
-    def softmax(self):
-        self.probabilities = np.exp(self.H)/np.sum(np.exp(self.H), axis=0)
+            return np.random.choice(self.n_arms, p=self.probabilities) # max val
 
     def update_H(self, chosen_arm):
-        self.softmax()
+        self.probabilities = np.exp(self.H)/np.sum(np.exp(self.H), axis=0)
         current_mean_reward = self.total/self.arm_pulls.sum()
         arm_bonus = self.alpha*(self.generated_reward - current_mean_reward)*(1-self.probabilities[chosen_arm])
         self.H[chosen_arm] += arm_bonus
@@ -33,6 +30,3 @@ class ActionPreferences(Agent):
             if arm != chosen_arm:
                 rest_bonus = self.alpha*(self.generated_reward - current_mean_reward)*(self.probabilities[arm])
                 self.H[arm] += rest_bonus
-
-    def highest_preference(self):
-        return np.random.choice(np.flatnonzero(self.H == self.H.max()))

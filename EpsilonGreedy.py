@@ -17,7 +17,7 @@ class EpsilonGreedy(Greedy):
         else:
             epsilon_random = random.random() # generate random val for epsilon
             
-            if epsilon_random < self.epsilon:
+            if epsilon_random > self.epsilon:
                 return np.random.choice(np.flatnonzero(self.estimated_values == self.estimated_values.max())) # max val
             else: 
                 return randrange(self.n_arms) # random val 

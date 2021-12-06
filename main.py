@@ -6,54 +6,44 @@ from UCB import UCB
 from SoftMax import SoftMax
 from ActionPreferences import ActionPreferences
 import Utils
+import argparse
 
+parser = argparse.ArgumentParser(add_help=True)
+parser.add_argument('--n_bandits', type=int, help='<int> The number of bandits to use.')
+parser.add_argument('--distribution', type=str, help='<string> Type "gaussian" or "bernoulli".')
+parser.add_argument('--time_steps', type=int, help='<int> The number of time steps to run each repetition for.')
+parser.add_argument('--repetitions', type=int, help='<int> The number of repetitions of each experiment.')
+parser.add_argument('--experiment_name', type=str, help='<string> The name that the .png file will be saved as (in the "plots" folder). Note that using the same name will overwrite the previous file.')
 
-# g = Utils.gaussianDis(5)
-# print(g)
-params = 5, "bernoulli"
-# params = 5, g, "gaussian"
+args = parser.parse_args()
+n_bandits = args.n_bandits
+distribution = args.distribution
+time_steps = args.time_steps
+repetitions = args.repetitions
+fig_name = args.experiment_name
 
-# g = Greedy(*params)
-# e = EpsilonGreedy(*params, 0.8)
-# u =  UCB(*params, 1)
-# o = Optimistic(*params)
-# s = SoftMax(*params, 0.3)
-# a = ActionPreferences(*params, 0.1)
+if distribution == "bernoulli":
+    epsilon = 0.15
+    c = 2
+    optimistic_val = 1
+    tau = 0.1
+    alpha = 0.5
+elif distribution == "gaussian":
+    epsilon = 0.15
+    c = 1
+    optimistic_val = 20
+    tau = 0.2
+    alpha = 0.1
 
-# u1 = UCB(*params, 1.5)
-# u2 = UCB(*params, 0.5)
-# u3 = UCB(*params, 1)
-# u4 = UCB(*params, 3)
-# u5 = UCB(*params, 2)
+params = n_bandits, distribution
 
-# e1 = EpsilonGreedy(*params, 0.99)
-# e2 = EpsilonGreedy(*params, 0.9)
-# e3 = EpsilonGreedy(*params, 1)
-# e4 = EpsilonGreedy(*params, 0.85)
-# e5 = EpsilonGreedy(*params, 0.75)
-# e6 = EpsilonGreedy(*params, 0.7)
-# e7 = EpsilonGreedy(*params, 0.95)
+g = Greedy(*params)
+e = EpsilonGreedy(*params, epsilon)
+u =  UCB(*params, c)
+o = Optimistic(*params, optimistic_val)
+s = SoftMax(*params, tau)
+a = ActionPreferences(*params, alpha)
+agents = [g, e, u, o, s, a]
 
-s1 = SoftMax(*params , 0.1) 
-s2 = SoftMax(*params , 0.5) 
-s3 = SoftMax(*params , 0.2) 
-s4 = SoftMax(*params , 0.05) 
-s5 = SoftMax(*params , 0.3) 
-s6 = SoftMax(*params , 0.8) 
-
-a1 = ActionPreferences(*params, 0.1)
-a2 = ActionPreferences(*params, 0.5)
-a3 = ActionPreferences(*params, 1)
-a4 = ActionPreferences(*params, 1.5)
-a5 = ActionPreferences(*params, 3)
-a6 = ActionPreferences(*params, 5)
-
-# agents = [u1, u2, u3, u4, u5]
-#agents = [e1, e2, e3, e4, e5, e6, e7]
-agents = [s1, s2, s3, s4, s5, s6]
-agents1 = [a1, a2, a3, a4, a5, a6]
-# r, p = Utils.concatenate_experiments(agents, 2000, 100)
-# Utils.plot_learning(r,p, "softmax 100 runs")
-
-x, y = Utils.concatenate_experiments(agents1, 2000, 100)
-Utils.plot_learning(x,y, "preferences 100 runs")
+reward, percentage = Utils.concatenate_experiments(agents, time_steps, repetitions)
+Utils.plot_learning(reward, percentage, fig_name)
