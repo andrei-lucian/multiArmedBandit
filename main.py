@@ -8,6 +8,8 @@ from ActionPreferences import ActionPreferences
 import Utils
 import argparse
 
+print('For help run program with flag -h \n')
+
 parser = argparse.ArgumentParser(add_help=True)
 parser.add_argument('--n_bandits', type=int, help='<int> The number of bandits to use.')
 parser.add_argument('--distribution', type=str, help='<string> Type "gaussian" or "bernoulli".')
