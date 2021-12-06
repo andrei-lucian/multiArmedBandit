@@ -24,7 +24,7 @@ fig_name = args.experiment_name
 
 if distribution == "bernoulli":
     epsilon = 0.15
-    c = 2
+    c = 1
     optimistic_val = 1
     tau = 0.1
     alpha = 0.5
